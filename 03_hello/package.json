@@ -1,5 +1,5 @@
 {
-  "name": "node-template",
+  "name": "date",
   "version": "1.0.0",
   "author": "",
   "description": "",
@@ -46,10 +46,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emirotin/node-template.git"
+    "url": "git+https://github.com/emirotin/date.git"
   },
   "bugs": {
-    "url": "https://github.com/emirotin/node-template/issues"
+    "url": "https://github.com/emirotin/date/issues"
   },
-  "homepage": "https://github.com/emirotin/node-template#readme"
+  "homepage": "https://github.com/emirotin/date#readme"
 }
