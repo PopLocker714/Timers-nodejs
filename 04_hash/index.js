@@ -1,9 +1,8 @@
 const crypto = require("crypto");
 
-const https = require("https");
-const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const downloadFile = require("./downloadFile");
 const hash = crypto.createHash("sha256");
 
 let fileName;
@@ -12,14 +11,12 @@ let pathToFile;
 (async () => {
   if (process.argv[2].includes("http://") || process.argv[2].includes("https://")) {
     fileName = process.argv[2].split("/")[process.argv[2].split("/").length - 1];
-    pathToFile = await downloadFile(process.argv[2], fileName);
+    await downloadFile(process.argv[2], fileName);
+    pathToFile = fileName;
   } else {
     pathToFile = path.resolve(__dirname, process.argv[2]);
     fileName = path.basename(pathToFile);
   }
-
-  console.log("PATH TO FILE:", pathToFile);
-  console.log("FILE NAME:", fileName);
 
   // A
   try {
@@ -63,60 +60,3 @@ let pathToFile;
   console.log("Success!");
   process.exit(0);
 })();
-
-async function downloadFile(url, fileName) {
-  let protocol;
-
-  if (process.argv[2].includes("http://")) {
-    protocol = http;
-  } else {
-    protocol = https;
-  }
-
-  const result = await Promise.all([
-    new Promise((resolve, reject) => {
-      protocol.get(url, (response) => {
-        const { statusCode } = response;
-        if (statusCode !== 200) {
-          reject(new Error(statusCode));
-        }
-
-        response.on("data", (data) => {
-          fs.writeFile(fileName, data, (err) => {
-            if (err) {
-              reject(new Error(err));
-            }
-            console.log("download is success: " + fileName);
-            resolve(fileName);
-          });
-        });
-      });
-    }),
-    new Promise((resolve, reject) => {
-      protocol.get(url + ".sha256", (response) => {
-        const { statusCode } = response;
-        if (statusCode !== 200) {
-          reject(new Error(statusCode));
-        }
-        response.on("data", (data) => {
-          fs.writeFile(fileName + ".sha256", data, (err) => {
-            if (err) {
-              reject(new Error(err));
-            }
-            console.log("download is success: " + fileName + ".sha256");
-            resolve(fileName + ".sha256");
-          });
-        });
-      });
-    }),
-  ])
-    .then((res) => {
-      return res[0];
-    })
-    .catch((err) => {
-      console.log(err.message);
-      process.exit(100);
-    });
-
-  return result;
-}
