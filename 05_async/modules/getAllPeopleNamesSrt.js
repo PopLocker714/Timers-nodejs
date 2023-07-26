@@ -1,6 +1,6 @@
 function getAllPeopleNamesSrt(people) {
   return people
-    .map((person) => person.name)
+    .map((person) => person)
     .toString()
     .replaceAll(",", ", ");
 }

@@ -1,6 +1,7 @@
 const { getAllPeopleNamesSrt } = require("./modules/getAllPeopleNamesSrt");
 const { getMinMaxHeightPerson } = require("./modules/getMinMaxHeightPerson");
 const getSearchRequests = require("./modules/getSearchRequests");
+const removeMirrorPeople = require("./modules/removeMirrorPeople");
 const searchPeople = require("./modules/searchPeople");
 
 const searchRequests = getSearchRequests();
@@ -36,9 +37,12 @@ if (searchRequests.length === 0) {
     });
   }
 
-  console.log(`Total results: ${allPeople.length}.`);
+  const peopleNames = removeMirrorPeople(allPeople);
+  console.log(peopleNames);
+
+  console.log(`Total results: ${peopleNames.length}.`);
   console.log();
-  console.log(`All: ${getAllPeopleNamesSrt(allPeople)}.`);
+  console.log(`All: ${getAllPeopleNamesSrt(peopleNames)}.`);
   console.log();
   const { min, max, maxName, minName } = getMinMaxHeightPerson(allPeople);
   console.log(`Min height: ${minName}, ${min}`);
