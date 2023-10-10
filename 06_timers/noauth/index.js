@@ -32,7 +32,7 @@ const TIMERS = [
     end: Date.now() - 6000,
     description: "Timer 1",
     duration: 5000,
-    progress: 5000,
+    progress: 0,
     isActive: true,
     id: nanoid(),
   },
@@ -40,7 +40,7 @@ const TIMERS = [
     start: Date.now() - 17000,
     end: Date.now() - 9000,
     duration: 8000,
-    progress: 8000,
+    progress: 3000,
     description: "Timer 2",
     isActive: true,
     id: nanoid(),
@@ -57,8 +57,8 @@ const TIMERS = [
 
 function createTimerInterval(timer) {
   const interval = setInterval(() => {
-    timer.progress -= 1000;
-    if (timer.progress === 0) {
+    timer.progress += 1000;
+    if (timer.progress >= timer.duration) {
       timer.isActive = false;
       clearInterval(interval);
     }
@@ -86,7 +86,7 @@ app.post("/api/timers", (req, res) => {
     start: Date.now() - 21000,
     end: Date.now() - 11000,
     duration: 10000,
-    progress: 10000,
+    progress: 0,
     id: nanoid(),
     isActive: true,
     ...req.body,
@@ -97,18 +97,13 @@ app.post("/api/timers", (req, res) => {
 });
 
 app.post("/api/timers/:id/stop", (req, res) => {
-  let currentIndexItem;
-  TIMERS.forEach(({ id }, index) => {
-    if (id === req.params.id) {
-      currentIndexItem = index;
-      return;
-    }
-  });
-  if (currentIndexItem !== undefined) {
-    TIMERS[currentIndexItem].isActive = false;
+  const timerIndex = TIMERS.findIndex((timer) => timer.id === req.params.id);
+  if (timerIndex !== -1) {
+    TIMERS[timerIndex].isActive = false;
+    res.json(TIMERS[timerIndex]);
+  } else {
+    res.status(404).json({ error: "Таймер не найден" });
   }
-
-  res.json(TIMERS[currentIndexItem]);
 });
 
 const port = process.env.PORT || 3000;
