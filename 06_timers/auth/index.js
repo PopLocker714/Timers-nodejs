@@ -1,42 +1,21 @@
 const express = require("express");
-const nunjucks = require("nunjucks");
-// const { nanoid } = require("nanoid");
+const cookieParser = require("cookie-parser");
+const nunjucksSetup = require("./modules/nunjucks-setup");
+
+const { auth } = require("./modules/functions");
 
 const app = express();
+app.use(cookieParser());
 
-nunjucks.configure("views", {
-  autoescape: true,
-  express: app,
-  tags: {
-    blockStart: "[%",
-    blockEnd: "%]",
-    variableStart: "[[",
-    variableEnd: "]]",
-    commentStart: "[#",
-    commentEnd: "#]",
-  },
-});
-
-app.set("view engine", "njk");
+nunjucksSetup.setupNunjucks(app);
 
 app.use(express.json());
 app.use(express.static("public"));
 
-// const hash = (d) => null;
+app.use("/", require("./modules/auth"));
+app.use("/api/timers", require("./modules/timers"));
 
-// const DB = {
-//   users: [
-//     {
-//       _id: nanoid(),
-//       username: "admin",
-//       password: hash("pwd007"),
-//     },
-//   ],
-//   sessions: {},
-//   timers: [],
-// };
-
-app.get("/", (req, res) => {
+app.get("/", auth(), (req, res) => {
   res.render("index", {
     user: req.user,
     authError: req.query.authError === "true" ? "Wrong username or password" : req.query.authError,
