@@ -1,3 +1,4 @@
+const { nanoid } = require("nanoid");
 const { DB } = require("../../DB");
 
 const getActiveTimers = (ownerId) =>
@@ -17,6 +18,21 @@ const getOldTimers = (ownerId) =>
       return timer.owner_id === ownerId && !timer.isActive;
     }
   });
+const createTimer = (description, owner_id, isActive = true, progress = 0) => {
+  const timer = {
+    start: Date.now(),
+    progress,
+    end: Date.now() + progress,
+    duration: progress,
+    id: nanoid(),
+    isActive,
+    owner_id,
+    description,
+  };
+
+  DB.timers.push(timer);
+  return timer;
+};
 
 const findActiveTimerById = (id, owner_id) => {
   const activeTimers = getActiveTimers(owner_id);
@@ -24,4 +40,4 @@ const findActiveTimerById = (id, owner_id) => {
   return activeTimers[timerIndex];
 };
 
-module.exports = { getActiveTimers, getOldTimers, findActiveTimerById };
+module.exports = { getActiveTimers, getOldTimers, findActiveTimerById, createTimer };

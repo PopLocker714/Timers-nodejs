@@ -5,6 +5,16 @@ const cookieParser = require("cookie-parser");
 const nunjucksSetup = require("./modules/nunjucks-setup");
 const { getActiveTimers } = require("./modules/timers/utils");
 const { auth } = require("./modules/auth/utils");
+// const knex = require("knex")({
+//   client: "pg",
+//   connection: {
+//     host: process.env.DB_HOST,
+//     port: process.env.DB_PORT || 5432,
+//     database: process.env.DB_NAME,
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PASSWORD,
+//   },
+// });
 
 const app = express();
 app.use(cookieParser());
@@ -17,10 +27,6 @@ app.use(express.static("public"));
 app.use("/", require("./modules/auth/auth"));
 app.use("/api/timers", require("./modules/timers/timers"));
 
-// console.log(knex)
-// knex("users").del().then((res) => console.log(res))
-
-// get active timer and increment these
 (() => {
   setInterval(() => {
     const timers = getActiveTimers();

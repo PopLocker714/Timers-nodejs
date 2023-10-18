@@ -1,8 +1,6 @@
 const express = require("express");
-const { nanoid } = require("nanoid");
 const { auth } = require("../auth/utils");
-const { getActiveTimers, getOldTimers, findActiveTimerById } = require("./utils");
-const { DB } = require("../../DB");
+const { getActiveTimers, getOldTimers, findActiveTimerById, createTimer } = require("./utils");
 
 const router = express.Router();
 
@@ -22,16 +20,8 @@ router.post("/", auth(), (req, res) => {
     return res.sendStatus(401);
   }
 
-  const timer = {
-    start: Date.now(),
-    progress: 0,
-    id: nanoid(),
-    isActive: true,
-    owner_id: req.user.id,
-    ...req.body,
-  };
+  const timer = createTimer(req.body.description, req.user.id);
 
-  DB.timers.push(timer);
   res.json(timer);
 });
 
@@ -52,6 +42,7 @@ router.post("/:id/stop", auth(), (req, res) => {
   timer.end = start + progress;
   timer.duration = progress;
   delete timer.progress;
+
   res.json(timer);
 });
 
