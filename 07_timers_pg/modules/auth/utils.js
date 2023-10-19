@@ -1,15 +1,40 @@
 const { nanoid } = require("nanoid");
-const { DB } = require("../../DB");
 const { createHash } = require("crypto");
+const { knex } = require("../knex-setup");
 
-const findUserByUsername = (username) => DB.users.find((user) => user.username === username);
+const findUserByUsername = async (username) =>
+  knex("users")
+    .select()
+    .where({ username })
+    .limit(1)
+    .then((res) => res[0]);
 
-const findUserBySessionId = (sessionId) => {
-  const userId = DB.sessions[sessionId];
-  if (!userId) {
+const findUserBySessionId = async (sessionId) => {
+  const session = await knex("sessions")
+    .select("user_id")
+    .where({ session_id: sessionId })
+    .limit(1)
+    .then((res) => res[0]);
+
+  if (!session) {
     return;
   }
-  return DB.users.find((user) => user.id === userId);
+
+  return await knex("users")
+    .select()
+    .where({ id: session.user_id })
+    .limit(1)
+    .then((res) => res[0]);
+};
+
+const createSession = async (userId) => {
+  const sessionId = nanoid();
+  await knex("sessions").insert({ user_id: userId, session_id: sessionId });
+  return sessionId;
+};
+
+const deleteSession = async (sessionId) => {
+  await knex("sessions").where({ session_id: sessionId }).delete();
 };
 
 const hashString = (str) => {
@@ -17,20 +42,10 @@ const hashString = (str) => {
   return hash.update(str).digest("hex");
 };
 
-const createUser = (username, password) => {
+const createUser = async (username, password) => {
   const user = { id: nanoid(), password: hashString(password), username };
-  DB.users.push(user);
+  await knex("users").insert(user);
   return user;
-};
-
-const createSession = (userId) => {
-  const sessionId = nanoid();
-  DB.sessions[sessionId] = userId;
-  return sessionId;
-};
-
-const deleteSession = (sessionId) => {
-  delete DB.sessions[sessionId];
 };
 
 const auth = () => async (req, res, next) => {
@@ -38,7 +53,7 @@ const auth = () => async (req, res, next) => {
     return next();
   }
 
-  const user = findUserBySessionId(req.cookies["sessionId"]);
+  const user = await findUserBySessionId(req.cookies["sessionId"]);
   req.user = user;
   req.sessionId = req.cookies["sessionId"];
   next();
@@ -51,5 +66,4 @@ module.exports = {
   createUser,
   hashString,
   findUserByUsername,
-  // findUserBySessionId,
 };

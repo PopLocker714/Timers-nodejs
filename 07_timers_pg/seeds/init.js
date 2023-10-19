@@ -1,16 +1,13 @@
-const { createUser } = require("../modules/auth/utils");
+const { createUser, findUserByUsername } = require("../modules/auth/utils");
 const { createTimer } = require("../modules/timers/utils");
 
-exports.seed = async function (knex) {
-  const admin = await knex("users").where("username", "admin");
-  const isHaveAdmin = admin.length !== 0;
+exports.seed = async function () {
+  const admin = await findUserByUsername("admin");
 
-  if (!isHaveAdmin) {
-    const user = createUser("admin", "pwd007");
-    const activeTimer = createTimer("Timer 0", user.id, true, 10000);
-    const oldTimer = createTimer("Timer 1", user.id, false, 60000);
-    await knex("users").insert(user);
-    await knex("timers").insert([activeTimer, oldTimer]);
+  if (!admin) {
+    const user = await createUser("admin", "pwd007");
+    const activeTimer = await createTimer("Timer 0", user.id, true, 10000);
+    const oldTimer = await createTimer("Timer 1", user.id, false, 60000);
 
     console.log("CREATE USER IN DB:");
     console.table([{ name: "admin", password: "pwd007" }]);

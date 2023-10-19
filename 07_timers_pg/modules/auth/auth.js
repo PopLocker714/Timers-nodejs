@@ -4,36 +4,40 @@ const { hashString, createSession, createUser, auth, deleteSession, findUserByUs
 
 const router = express.Router();
 
-router.post("/login", bodyParser.urlencoded({ extended: false }), (req, res) => {
+router.post("/login", bodyParser.urlencoded({ extended: false }), async (req, res) => {
   const { username, password } = req.body;
-  const user = findUserByUsername(username);
+  const user = await findUserByUsername(username);
   if (!user || user.password !== hashString(password)) {
     return res.redirect("/?authError=true");
   }
 
-  const sessionId = createSession(user.id);
-
+  const sessionId = await createSession(user.id);
   res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
 });
 
-router.post("/signup", bodyParser.urlencoded({ extended: false }), (req, res) => {
+router.post("/signup", bodyParser.urlencoded({ extended: false }), async (req, res) => {
   const { username, password } = req.body;
 
-  if (!username.length && !password.length) {
+  if (username.length === 0 || password.length === 0) {
     return res.redirect("/?authError=true");
   }
 
-  const user = createUser(username, password);
-
-  const sessionId = createSession(user.id);
-  res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
+  try {
+    const user = await createUser(username, password);
+    const sessionId = await createSession(user.id);
+    res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
+  } catch (error) {
+    console.log(error.message);
+    return res.redirect("/?authError=true");
+  }
 });
 
-router.get("/logout", auth(), (req, res) => {
+router.get("/logout", auth(), async (req, res) => {
   if (!req.user) {
     return res.redirect("/");
   }
-  deleteSession(req.sessionId);
+
+  await deleteSession(req.sessionId);
   res.clearCookie("sessionId").redirect("/");
 });
 
