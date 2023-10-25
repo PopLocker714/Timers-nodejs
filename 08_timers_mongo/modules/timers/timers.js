@@ -9,7 +9,7 @@ router.get("/", auth(), isAuth(), async (req, res) => {
   try {
     res.json(await getTimers(req.db, { ownerId: req.user._id, ...req.query }));
   } catch (err) {
-    return res.status(401).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 });
 
@@ -20,7 +20,7 @@ router.post("/", auth(), isAuth(), async (req, res) => {
     timer.id = timer._id.toString();
     res.json(timer);
   } catch (err) {
-    return res.status(401).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 });
 
@@ -33,7 +33,7 @@ router.post("/:id/stop", auth(), isAuth(), async (req, res) => {
     }
     res.json(timer);
   } catch (err) {
-    return res.status(401).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 });
 
