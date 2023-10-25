@@ -1,8 +1,6 @@
 const { createUser } = require("../modules/auth/utils");
 const { createTimer } = require("../modules/timers/utils");
 
-// https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
-
 module.exports = {
   async up(db) {
     const user = await createUser(db, "admin", "pwd007");
@@ -23,9 +21,6 @@ module.exports = {
     console.table([{ name: "admin", password: "pwd007" }]);
     console.log("CREATE TIMERS IN DB:");
     console.table([activeTimer, oldTimer]);
-
-    // await db.collection("users").insertOne(user);
-    // await db.collection("timers").insertMore(user);
   },
 
   async down(db) {

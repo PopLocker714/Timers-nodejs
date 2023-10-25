@@ -1,6 +1,7 @@
 const { nanoid } = require("nanoid");
 const { createHash } = require("crypto");
 const { ObjectId } = require("mongodb");
+const cookieName = process.env.COOKE_NAME || "sessionId";
 
 const findUserByUsername = async (db, username) => db.collection("users").findOne({ username });
 
@@ -34,13 +35,13 @@ const createUser = async (db, username, password) => {
 };
 
 const auth = () => async (req, res, next) => {
-  if (!req.cookies["sessionId"]) {
+  if (!req.cookies[cookieName]) {
     return next();
   }
 
-  const user = await findUserBySessionId(req.db, req.cookies["sessionId"]);
+  const user = await findUserBySessionId(req.db, req.cookies[cookieName]);
   req.user = user;
-  req.sessionId = req.cookies["sessionId"];
+  req.sessionId = req.cookies[cookieName];
   next();
 };
 

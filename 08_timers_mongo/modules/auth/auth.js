@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { hashString, createSession, createUser, auth, deleteSession, findUserByUsername, isAuth } = require("./utils");
+const cookieName = process.env.COOKE_NAME || "sessionId";
+const httpOnly = process.env.IS_HTTP || true;
 
 const router = express.Router();
 
@@ -12,7 +14,7 @@ router.post("/login", bodyParser.urlencoded({ extended: false }), async (req, re
   }
 
   const sessionId = await createSession(req.db, user._id);
-  res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
+  res.cookie(cookieName, sessionId, { httpOnly }).redirect("/");
 });
 
 router.post("/signup", bodyParser.urlencoded({ extended: false }), async (req, res) => {
@@ -25,7 +27,7 @@ router.post("/signup", bodyParser.urlencoded({ extended: false }), async (req, r
   try {
     const user = await createUser(req.db, username, password);
     const sessionId = await createSession(req.db, user._id);
-    res.cookie("sessionId", sessionId, { httpOnly: true }).redirect("/");
+    res.cookie(cookieName, sessionId, { httpOnly }).redirect("/");
   } catch (error) {
     console.log(error.message);
     return res.redirect("/?authError=true");
@@ -34,7 +36,7 @@ router.post("/signup", bodyParser.urlencoded({ extended: false }), async (req, r
 
 router.get("/logout", auth(), isAuth(true), async (req, res) => {
   await deleteSession(req.db, req.sessionId);
-  res.clearCookie("sessionId").redirect("/");
+  res.clearCookie(cookieName).redirect("/");
 });
 
 module.exports = router;

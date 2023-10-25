@@ -38,6 +38,17 @@ const incrementTimer = async (db) => {
   db.collection("timers").updateMany({ isActive: true }, { $inc: { progress: 1000 } });
 };
 
+let isTimerIncStart = false;
+
+function startTimer(db) {
+  if (!isTimerIncStart) {
+    setInterval(() => {
+      incrementTimer(db);
+    }, 1000);
+    isTimerIncStart = true;
+  }
+}
+
 const stopTimer = async (db, { id, ownerId }) => {
   const searchParams = { ownerId: new ObjectId(ownerId), _id: new ObjectId(id) };
   const timer = await db.collection("timers").findOne(searchParams);
@@ -54,4 +65,4 @@ const stopTimer = async (db, { id, ownerId }) => {
   return resultTimer;
 };
 
-module.exports = { createTimer, getTimers, incrementTimer, stopTimer };
+module.exports = { createTimer, getTimers, stopTimer, startTimer };
