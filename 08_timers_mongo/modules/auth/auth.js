@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { hashString, createSession, createUser, auth, deleteSession, findUserByUsername, isAuth } = require("./utils");
-const cookieName = process.env.COOKE_NAME || "sessionId";
+const cookieName = process.env.COOKIE_NAME || "sessionId";
 const httpOnly = process.env.IS_HTTP || true;
 
 const router = express.Router();

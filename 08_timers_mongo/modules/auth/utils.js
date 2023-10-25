@@ -1,7 +1,7 @@
 const { nanoid } = require("nanoid");
 const { createHash } = require("crypto");
 const { ObjectId } = require("mongodb");
-const cookieName = process.env.COOKE_NAME || "sessionId";
+const cookieName = process.env.COOKIE_NAME || "sessionId";
 
 const findUserByUsername = async (db, username) => db.collection("users").findOne({ username });
 
