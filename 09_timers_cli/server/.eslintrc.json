@@ -4,12 +4,12 @@
   "env": {
     "node": true,
     "jest/globals": true,
-    "es6": true
+    "es6": true,
+    "browser": true
   },
   "plugins": ["prettier", "jest"],
   "rules": {
     "no-process-exit": 0
   },
-  "globals": { "fetch": false },
   "settings": {}
 }
