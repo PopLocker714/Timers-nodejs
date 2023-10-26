@@ -1,7 +1,7 @@
 const { getSessionId } = require("./utils");
 
 const signup = async (inquirer) => {
-  if (await getSessionId()) {
+  if (getSessionId()) {
     return console.log("You are already logged in!");
   }
 
@@ -29,15 +29,10 @@ const signup = async (inquirer) => {
 
   try {
     const res = await fetch(url, { method: "post" }).then((res) => res.json());
-
-    if (res.error) {
-      throw res.error;
-    }
-
-    // createSession(res.sessionId);
-
+    if (res.error) throw res.error;
     console.log("Signed up successfully!");
   } catch (err) {
+    if (err.message === "fetch failed") return console.log("No server connect!");
     console.log(err);
   }
 };

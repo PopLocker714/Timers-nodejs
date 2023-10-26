@@ -1,7 +1,7 @@
 const { getSessionId, clearSessionId } = require("./utils");
 
 const logout = async () => {
-  if (await getSessionId()) {
+  if (getSessionId()) {
     clearSessionId();
     return console.log("Logged out successfully!");
   }

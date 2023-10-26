@@ -18,23 +18,29 @@ const createSession = (sessionId) => {
   }
 };
 
-const getSessionId = async () => {
+const getSessionId = () => {
   try {
-    return await fs.readFile(getSessionFileName(), "utf8", (err, data) => {
+    return fs.readFileSync(getSessionFileName(), "utf8", (err, data) => {
       if (err) throw err;
       return data;
     });
   } catch (err) {
-    return false;
+    if (err.code === "ENOENT") {
+      return;
+    }
+    console.log(err);
   }
 };
 
-const clearSessionId = async () => {
+const clearSessionId = () => {
   try {
-    await fs.unlink(getSessionFileName(), (err) => {
+    fs.unlinkSync(getSessionFileName(), (err) => {
       if (err) throw err;
     });
   } catch (err) {
+    if (err.code === "ENOENT") {
+      return;
+    }
     console.log(err);
   }
 };

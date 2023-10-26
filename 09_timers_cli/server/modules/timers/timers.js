@@ -9,6 +9,8 @@ router.get("/", auth(), isAuth(), async (req, res) => {
   try {
     res.json(await getTimers(req.db, { ownerId: req.user._id, ...req.query }));
   } catch (err) {
+
+    if (err.message === "input must be a 24 character hex string, 12 byte Uint8Array, or an integer") return res.status(400).json({ error: "Timer is not found" });
     return res.status(400).json({ error: err.message });
   }
 });
@@ -32,11 +34,11 @@ router.post("/", auth(), isAuth(), async (req, res) => {
 router.post("/:id/stop", auth(), isAuth(), async (req, res) => {
   try {
     const timer = await stopTimer(req.db, { id: req.params.id, ownerId: req.user._id });
-    if (!timer) {
-      return res.status(404).json({ error: "Таймер не найден" });
-    }
     res.json(timer);
   } catch (err) {
+    if (err.message === "input must be a 24 character hex string, 12 byte Uint8Array, or an integer") {
+      return res.status(404).json({ error: "Unknown timer" });
+    }
     return res.status(400).json({ error: err.message });
   }
 });

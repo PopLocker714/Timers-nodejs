@@ -1,6 +1,5 @@
 const express = require("express");
 const { hashString, createSession, createUser, auth, deleteSession, findUserByUsername, isAuth } = require("./utils");
-const cookieName = process.env.COOKE_NAME || "session-id";
 
 const router = express.Router();
 
@@ -25,7 +24,7 @@ router.post("/signup", async (req, res) => {
   try {
     const userIsHave = await findUserByUsername(req.db, username);
     if (userIsHave) {
-      return res.json({ error: "User is have" });
+      return res.json({ error: "A user with the same name already exists" });
     }
 
     const user = await createUser(req.db, username, password);
