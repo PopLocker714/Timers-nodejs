@@ -2,7 +2,7 @@ require("dotenv").config();
 const inquirer = require("inquirer");
 
 if (!process.env.SERVER) {
-  return console.log("Error: env SERVER is not found");
+  return console.error("Error: env SERVER is not found");
 }
 
 const argv = require("minimist")(process.argv.slice(2));
@@ -25,16 +25,17 @@ const { stop } = require("./scripts/timers/stop");
       await logout();
       break;
     case "status":
-      status(argv._[1]);
+      await status(argv._[1]);
       break;
     case "start":
-      start(argv._[1]);
+      await start(argv._[1]);
       break;
     case "stop":
-      stop(argv._[1]);
+      await stop(argv._[1]);
       break;
     default:
-      console.log(`Unknown command ${argv._[0]}`);
+      console.error(`Unknown command ${argv._[0]}`);
+      console.info("Available commands: signup, login, logout, status, start, stop");
       break;
   }
 })();

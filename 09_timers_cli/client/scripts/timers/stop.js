@@ -5,11 +5,15 @@ const stop = async (timerId) => {
     return console.log("Error: timer ID is undefined");
   }
 
-  const { error, id } = await stopTimerById(timerId);
+  const timer = await stopTimerById(timerId);
 
-  if (error) return console.log(error, `ID ${timerId}`);
+  if (!timer) {
+    return;
+  }
 
-  console.log(`Timer ${id} stopped.`);
+  if (timer.error) return console.log(timer.error, `ID ${timerId}`);
+
+  console.log(`Timer ${timer.id} stopped.`);
 };
 
 module.exports = { stop };

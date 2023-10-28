@@ -6,9 +6,13 @@ const start = async (name) => {
   }
 
   if (typeof name === "string") {
-    const { error, id } = await createTimer(name);
-    if (error) return console.log(error);
-    return console.log(`Started timer "${name}", ID: ${id}.`);
+    const timer = await createTimer(name);
+    if (!timer) {
+      return;
+    }
+
+    // if (error) return console.log(error);
+    return console.log(`Started timer "${name}", ID: ${timer}.`);
   }
   console.log("Error: unknown argument: ", name);
 };

@@ -1,4 +1,26 @@
 const { getSessionId } = require("../auth/utils");
+const Table = require("cli-table");
+
+const displayTimers = async (filter) => {
+  try {
+    const timers = await getTimers({ isActive: filter.isActive });
+    if (!timers) return;
+
+    if (timers.length === 0) return console.log(filter.log);
+
+    const table = new Table({
+      head: ["ID", "Task", "Time"],
+      colWidths: [30, 20, 10],
+    });
+
+    timers.forEach((timer) => {
+      table.push([timer.id, timer.description, formatDuration(timer.progress)]);
+    });
+    console.log(table.toString());
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const getTimers = async ({ isActive, id }) => {
   const url = new URL(process.env.SERVER + "/api/timers");
@@ -12,17 +34,22 @@ const getTimers = async ({ isActive, id }) => {
         "session-id": getSessionId(),
       },
     }).then((res) => res.json());
+
     if (res.error) throw res;
+
     return res;
   } catch (err) {
     if (err.message === "fetch failed") return console.log("No server connect!");
-    return err;
+    if (err.message === `Unexpected token 'U', "Unauthorized" is not valid JSON`)
+      return console.log("You not unauthorized!");
+    return { error: err.message };
   }
 };
 
 const createTimer = async (description) => {
   const url = new URL(process.env.SERVER + "/api/timers");
   url.searchParams.append("description", description);
+
   try {
     const res = await fetch(url, {
       method: "post",
@@ -30,10 +57,14 @@ const createTimer = async (description) => {
         "session-id": getSessionId(),
       },
     }).then((res) => res.json());
+
     if (res.error) throw res.error;
+
     return res;
   } catch (err) {
     if (err.message === "fetch failed") return console.log("No server connect!");
+    if (err.message === `Unexpected token 'U', "Unauthorized" is not valid JSON`)
+      return console.log("You not unauthorized!");
     console.log(err);
   }
 };
@@ -51,6 +82,8 @@ const stopTimerById = async (id) => {
     return timer;
   } catch (err) {
     if (err.message === "fetch failed") return console.log("No server connect!");
+    if (err.message === `Unexpected token 'U', "Unauthorized" is not valid JSON`)
+      return console.log("You not unauthorized!");
     return err;
   }
 };
@@ -67,4 +100,4 @@ const formatDuration = (d) => {
     .join(":");
 };
 
-module.exports = { getTimers, createTimer, stopTimerById, formatDuration };
+module.exports = { getTimers, createTimer, stopTimerById, formatDuration, displayTimers };
