@@ -16,14 +16,8 @@ const createTimer = async (db, { description, ownerId, isActive = true, progress
   return { ...timer, _id: insertedId };
 };
 
-const getTimers = async (db, { ownerId, isActive, id }) => {
-  const _id = id ? new ObjectId(id) : undefined;
-  const whereReq = { isActive: isActive, ownerId, _id };
-  if (isActive === "true") {
-    whereReq.isActive = true;
-  } else if (isActive === "false") {
-    whereReq.isActive = false;
-  }
+const getTimers = async (db, { ownerId, isActive, timerId }) => {
+  const whereReq = { isActive: isActive === "true" ? true : false, ownerId, _id: timerId };
 
   for (const key in whereReq) {
     if (whereReq[key] === undefined) {
@@ -56,11 +50,8 @@ function startTimer(db) {
 }
 
 const stopTimer = async (db, { id, ownerId }) => {
-  const searchParams = { ownerId: new ObjectId(ownerId), _id: new ObjectId(id), isActive: true };
+  const searchParams = { ownerId: new ObjectId(ownerId), _id: new ObjectId(id) };
   const timer = await db.collection("timers").findOne(searchParams);
-  if (!timer) {
-    throw new Error("Unknown timer");
-  }
   const resultTimer = await db.collection("timers").findOneAndUpdate(
     searchParams,
     {

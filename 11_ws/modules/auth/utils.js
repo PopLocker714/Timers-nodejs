@@ -1,7 +1,7 @@
 const { nanoid } = require("nanoid");
 const { createHash } = require("crypto");
 const { ObjectId } = require("mongodb");
-const cookieName = process.env.COOKE_NAME || "session-id";
+const cookieName = process.env.COOKIE_NAME || "sessionId";
 
 const findUserByUsername = async (db, username) => db.collection("users").findOne({ username });
 
@@ -35,13 +35,13 @@ const createUser = async (db, username, password) => {
 };
 
 const auth = () => async (req, res, next) => {
-  if (!req.headers[cookieName]) {
+  if (!req.cookies[cookieName]) {
     return next();
   }
 
-  const user = await findUserBySessionId(req.db, req.headers[cookieName]);
+  const user = await findUserBySessionId(req.db, req.cookies[cookieName]);
   req.user = user;
-  req.sessionId = req.headers[cookieName];
+  req.sessionId = req.cookies[cookieName];
   next();
 };
 
@@ -49,7 +49,7 @@ const isAuth =
   (isRedirect = false) =>
   async (req, res, next) => {
     if (!req.user && isRedirect) {
-      return res.json({});
+      return res.redirect();
     }
 
     if (!req.user) {
@@ -57,6 +57,16 @@ const isAuth =
     }
     next();
   };
+const authWs = () => async (ws, req, next) => {
+  if (!req.cookies[cookieName]) {
+    return next();
+  }
+
+  const user = await findUserBySessionId(req.db, req.cookies[cookieName]);
+  req.user = user;
+  req.sessionId = req.cookies[cookieName];
+  next();
+};
 
 module.exports = {
   auth,
@@ -66,5 +76,5 @@ module.exports = {
   hashString,
   findUserByUsername,
   isAuth,
-  findUserBySessionId,
+  authWs,
 };
