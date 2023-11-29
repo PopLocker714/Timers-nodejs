@@ -51,10 +51,10 @@ app.ws("/", authWs(), (ws, req) => {
   });
 });
 
-const port = process.env.PORT || 3000;
+// const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`  Listening on http://localhost:${port}`);
-});
+/* app.listen(port, () => {
+  console.log(`  Listening on ${process.env.IS_HTTP ? "http" : "https"}://localhost:${port}`);
+}); */
 
 module.exports = app;
