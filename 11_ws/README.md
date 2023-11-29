@@ -1,3 +1,10 @@
+
+# Timers
+
+- authorization/authentication
+- WebSockets server/client
+- data base MongoDB
+
 Клиентский код идентичен части noauth.
 API точно так же работают по AJAX.
 
