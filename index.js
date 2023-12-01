@@ -25,7 +25,7 @@ app.use("/api/timers", require("./modules/timers/timers"));
 
 app.get("/", auth(), (req, res) => {
   startTimer(req.db);
-  res.render("index", {
+  res.render(__dirname + "/views/index.njk", {
     user: req.user,
     authError: req.query.authError === "true" ? "Wrong username or password" : req.query.authError,
   });
