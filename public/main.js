@@ -2,7 +2,8 @@
 
 (() => {
   const createWs = (context) => {
-    const wsProto = location.protocol === "http:" ? "ws:" : "wss:";
+    // const wsProto = location.protocol === "http:" ? "ws:" : "wss:";
+    const wsProto = "ws:";
     const ws = new WebSocket(`${wsProto}//${location.host}`);
 
     /* ws.addEventListener("open", () => {
