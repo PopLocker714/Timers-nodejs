@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const cookieParser = require("cookie-parser");
 const nunjucksSetup = require("./modules/nunjucks-setup");
 const { startTimer } = require("./modules/timers/utils");
@@ -16,14 +17,14 @@ app.use(cookieParser());
 nunjucksSetup.setupNunjucks(__dirname, app);
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 
 app.use("/", require("./modules/mongo-setup"));
 app.use("/", require("./modules/auth/auth"));
 app.use("/api/timers", require("./modules/timers/timers"));
 
-console.log(__dirname);
+console.log("STATIC PATH: ", path.join(__dirname, "public"));
 
 app.get("/", auth(), (req, res) => {
   startTimer(req.db);
