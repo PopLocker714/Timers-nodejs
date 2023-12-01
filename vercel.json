@@ -16,13 +16,26 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "index.js"
+      "handle": "filesystem"
     },
     {
-      "src": "/public/(.*)",
-      "headers": { "Cache-Control": "public, max-age=31556952, immutable" },
-      "continue": true
+      "src": "/(.*)",
+      "dest": "/public/main.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "index.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/public/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31556952, immutable"
+        }
+      ]
     }
   ]
 }
