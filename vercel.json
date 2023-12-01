@@ -19,7 +19,7 @@
       "handle": "filesystem"
     },
     {
-      "src": "/(.*)",
+      "src": "/public/(.*)",
       "dest": "/public/*"
     },
     {
