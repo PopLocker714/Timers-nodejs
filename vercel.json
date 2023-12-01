@@ -20,7 +20,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/public/main.js"
+      "dest": "/public/*"
     },
     {
       "src": "/(.*)",
