@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const nunjucksSetup = require("./modules/nunjucks-setup");
@@ -11,7 +12,7 @@ const app = express();
 require("express-ws")(app);
 app.use(cookieParser());
 
-nunjucksSetup.setupNunjucks(app);
+nunjucksSetup.setupNunjucks(__dirname, app);
 
 app.use(express.json());
 app.use(express.static("public"));
@@ -51,10 +52,12 @@ app.ws("/", authWs(), (ws, req) => {
   });
 });
 
-// const port = process.env.PORT || 3000;
+if (process.env.IS_DEV === "true") {
+  const port = process.env.PORT || 3000;
 
-/* app.listen(port, () => {
-  console.log(`  Listening on ${process.env.IS_HTTP ? "http" : "https"}://localhost:${port}`);
-}); */
-
-module.exports = app;
+  app.listen(port, () => {
+    console.log(`  Listening on ${process.env.IS_HTTP === "true" ? "http" : "https"}://localhost:${port}`);
+  });
+} else {
+  module.exports = app;
+}
