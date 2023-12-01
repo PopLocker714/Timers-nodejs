@@ -1,7 +1,7 @@
 const nunjucks = require("nunjucks");
 
 function setupNunjucks(path, app) {
-  nunjucks.configure(path + "/public/views", {
+  nunjucks.configure(path, {
     autoescape: true,
     express: app,
     tags: {
