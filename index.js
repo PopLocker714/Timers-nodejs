@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const nunjucksSetup = require("./modules/nunjucks-setup");
 const { startTimer } = require("./modules/timers/utils");
@@ -16,6 +17,7 @@ nunjucksSetup.setupNunjucks(__dirname, app);
 
 app.use(express.json());
 app.use(express.static("public"));
+app.use(cors());
 
 app.use("/", require("./modules/mongo-setup"));
 app.use("/", require("./modules/auth/auth"));
