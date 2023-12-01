@@ -16,13 +16,6 @@
   ],
   "routes": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/public/(.*)",
-      "dest": "/public/*"
-    },
-    {
       "src": "/(.*)",
       "dest": "index.js"
     }
