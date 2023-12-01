@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
-const cors = require("cors");
+// const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const nunjucksSetup = require("./modules/nunjucks-setup");
@@ -18,7 +18,7 @@ nunjucksSetup.setupNunjucks(__dirname, app);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors());
+// app.use(cors());
 
 app.use("/", require("./modules/mongo-setup"));
 app.use("/", require("./modules/auth/auth"));
@@ -30,7 +30,7 @@ app.get("/", auth(), (req, res) => {
   startTimer(req.db);
   res.render(__dirname + "/views/index.njk", {
     user: req.user,
-    path: { public: "/public" },
+    path: { public: path.join(__dirname, "public") },
     authError: req.query.authError === "true" ? "Wrong username or password" : req.query.authError,
   });
 });
