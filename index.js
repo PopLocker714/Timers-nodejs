@@ -27,7 +27,7 @@ app.get("/", auth(), (req, res) => {
   startTimer(req.db);
   res.render(__dirname + "/views/index.njk", {
     user: req.user,
-    path: { public: __dirname },
+    path: { public: "" },
     authError: req.query.authError === "true" ? "Wrong username or password" : req.query.authError,
   });
 });
