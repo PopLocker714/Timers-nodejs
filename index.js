@@ -23,11 +23,13 @@ app.use("/", require("./modules/mongo-setup"));
 app.use("/", require("./modules/auth/auth"));
 app.use("/api/timers", require("./modules/timers/timers"));
 
+console.log(__dirname);
+
 app.get("/", auth(), (req, res) => {
   startTimer(req.db);
   res.render(__dirname + "/views/index.njk", {
     user: req.user,
-    path: { public: "public" },
+    path: { public: "/public" },
     authError: req.query.authError === "true" ? "Wrong username or password" : req.query.authError,
   });
 });
