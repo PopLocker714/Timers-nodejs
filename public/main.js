@@ -1,38 +1,38 @@
-/*global UIkit, Vue */
+/*global UIkit, Vue, Pusher, */
+
+// Enable pusher logging - don't include this in production
+// Pusher.logToConsole = true;
 
 (() => {
-  const createWs = (context) => {
-    // const wsProto = location.protocol === "http:" ? "ws:" : "wss:";
-    const wsProto = "ws:";
-    const ws = new WebSocket(`${wsProto}//${location.host}`);
-
-    /* ws.addEventListener("open", () => {
-      console.log("WebSocket connection established");
-    }); */
-
-    ws.addEventListener("message", (event) => {
-      let data = null;
-      try {
-        data = JSON.parse(event.data);
-      } catch (error) {
-        console.error(error);
-        return;
-      }
-
-      if (data.type === "OLD_TIMERS") {
-        context.oldTimers = data.timers;
-      }
-
-      if (data.type === "ACTIVE_TIMERS") {
-        context.activeTimers = data.timers;
-      }
+  const createPusher = (context, connectionCallback) => {
+    const pusher = new Pusher("c2b8efa8df3788ccdb62", {
+      cluster: "eu",
     });
 
-    ws.addEventListener("close", () => {
-      console.log("WebSocket connection closed");
-    });
+    context.channel = pusher.subscribe(window.user);
 
-    return ws;
+    pusher.connection.bind("connected", () => {
+      context.channel.bind("message", ({ message }) => {
+        let data = null;
+
+        try {
+          data = JSON.parse(message);
+        } catch (error) {
+          console.error(error);
+          return;
+        }
+
+        if (data.type === "OLD_TIMERS") {
+          context.oldTimers = data.timers;
+        }
+
+        if (data.type === "ACTIVE_TIMERS") {
+          context.activeTimers = data.timers;
+        }
+      });
+
+      connectionCallback();
+    });
   };
 
   const notification = (config) =>
@@ -77,19 +77,31 @@
       oldTimers: [],
     },
     methods: {
-      fetchActiveTimers() {
-        if (!this.ws) return console.log("no ws");
-        this.ws.send(JSON.stringify({ type: "ACTIVE_TIMERS" }));
-        /* fetchJson("/api/timers?isActive=true").then((activeTimers) => {
-          this.activeTimers = activeTimers;
-        }); */
+      async fetchActiveTimers() {
+        if (!this.channel) return console.log("Pusher channel not set");
+        fetchJson("/api/timers/trigger", {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "ACTIVE_TIMERS",
+            channel: window.user,
+          }),
+        });
       },
       fetchOldTimers() {
-        if (!this.ws) return console.log("no ws");
-        this.ws.send(JSON.stringify({ type: "OLD_TIMERS" }));
-        /* fetchJson("/api/timers?isActive=false").then((oldTimers) => {
-          this.oldTimers = oldTimers;
-        }); */
+        if (!this.channel) return console.log("Pusher channel not set");
+        fetchJson("/api/timers/trigger", {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "OLD_TIMERS",
+            channel: window.user,
+          }),
+        });
       },
       createTimer() {
         const description = this.desc;
@@ -130,22 +142,13 @@
       },
     },
     created() {
-      let isOpen = false;
-      this.ws = createWs(this);
-      this.ws.addEventListener("open", () => {
-        isOpen = true;
-      });
-
-      const interval = setInterval(() => {
-        if (isOpen) {
+      createPusher(this, () => {
+        this.fetchActiveTimers();
+        setInterval(() => {
           this.fetchActiveTimers();
-          setInterval(() => {
-            this.fetchActiveTimers();
-          }, 1000);
-          this.fetchOldTimers();
-          clearInterval(interval);
-        }
-      }, 200);
+        }, 1000);
+        this.fetchOldTimers();
+      });
     },
   });
 })();

@@ -1,6 +1,8 @@
 const express = require("express");
 const { auth, isAuth } = require("../auth/utils");
 const { createTimer, getTimers, stopTimer } = require("./utils");
+const bodyParser = require("body-parser");
+const pusher = require("../pusher-setup");
 
 const router = express.Router();
 
@@ -32,6 +34,34 @@ router.post("/:id/stop", auth(), isAuth(), async (req, res) => {
       return res.status(404).json({ error: "Таймер не найден" });
     }
     res.json(timer);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+router.post("/trigger", auth(), isAuth(), bodyParser.urlencoded({ extended: false }), async (req, res) => {
+  try {
+    const { type, channel } = req.body;
+
+    if (type === "ACTIVE_TIMERS") {
+      pusher.trigger(channel, "message", {
+        message: JSON.stringify({
+          type: "ACTIVE_TIMERS",
+          timers: await getTimers(req.db, { ownerId: req.user._id, isActive: "true" }),
+        }),
+      });
+      res.json({ status: 200 });
+    }
+
+    if (type === "OLD_TIMERS") {
+      pusher.trigger(channel, "message", {
+        message: JSON.stringify({
+          type: "OLD_TIMERS",
+          timers: await getTimers(req.db, { ownerId: req.user._id, isActive: "false" }),
+        }),
+      });
+      res.json({ status: 200 });
+    }
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }

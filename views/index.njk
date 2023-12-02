@@ -3,9 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <title>Timers</title>
-    <link rel="icon" type="image/png" href="[[ path.public ]]/clock.png">
+    <link rel="icon" type="image/png" href="/clock.png">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.4/dist/css/uikit.min.css" />
+
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
     <style>
       [v-cloak] {
@@ -64,7 +66,10 @@
       <script src="https://cdn.jsdelivr.net/npm/uikit@3.5.4/dist/js/uikit-icons.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-      <script type="text/javascript" src="[[ path.public ]]/main.js"></script>
+      <script>
+        window.user = "[[ user._id ]]"
+      </script>
+      <script type="text/javascript" src="/main.js"></script>
     [% else %]
       <section class="uk-container uk-margin-top uk-margin-bottom">
         [% if authError %]
