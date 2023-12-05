@@ -1,16 +1,25 @@
-
 # Timers
 
 - authorization/authentication
-- WebSockets server/client
-- data base MongoDB
+- Используется WebSockets server/client
+- База данных MongoDB
 
-Клиентский код идентичен части noauth.
-API точно так же работают по AJAX.
+## По умолчанию создается админ
 
-Шаблон index.njk отличается, его нужно изучить.
+- `LOGIN` : `admin`
+- `PASSWORD` : `pwd007`
 
-Регистрация /signup и аутентификция /login работают через «обычную» отпраку формы, см. шаблон.
+## Install
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+## DEV
 
 Важный момент: для того чтобы избежать конфликта между синтаксисом Vue и Nunjucks последние настроены так, что для серверных шаблонов вместо фигурных скобок используются квадратные:
 
@@ -24,8 +33,3 @@ API точно так же работают по AJAX.
     commentEnd: "#]",
   },
 ```
-
-## По умолчанию создается админ
-
-- `LOGIN` : `admin`
-- `PASSWORD` : `pwd007`
